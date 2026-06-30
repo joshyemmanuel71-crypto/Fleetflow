@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FleetFlow - Logistics Management System</title>
+  <meta name="description" content="Modern logistics, route planning, real-time vehicle GPS tracking, driver management, and financial analytics dashboard.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Login Page View Overlay -->
+  <div id="login-view" class="login-overlay">
+    <div class="login-card">
+      <div class="logo-section" style="justify-content: center; margin-bottom: 24px;">
+        <div class="logo-icon">FF</div>
+        <h1 class="logo-text" style="font-size: 2rem;">FleetFlow</h1>
+      </div>
+      
+      <h2 style="text-align: center; font-size: 1.2rem; color: var(--text-primary); margin-bottom: 8px;">Welcome to FleetFlow</h2>
+      <p style="text-align: center; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 24px;">Enter credentials to access the fleet logistics system.</p>
+
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="driver-form-group" style="margin-bottom: 16px;">
+          <label class="driver-form-label" style="color: var(--text-secondary);">Select Account Role</label>
+          <select id="login-role" class="driver-form-input" style="background: rgba(255,255,255,0.05); color: #fff; border-color: var(--border-color); width:100%;" onchange="updateDefaultCredentials()">
+            <option value="manager">Operations Manager (Enterprise)</option>
+            <option value="driver">Mobile Fleet Driver</option>
+          </select>
+        </div>
+
+        <div class="driver-form-group" style="margin-bottom: 16px;">
+          <label class="driver-form-label" style="color: var(--text-secondary);">Username / Email</label>
+          <input type="email" id="login-email" class="driver-form-input" style="background: rgba(255,255,255,0.05); color: #fff; border-color: var(--border-color); width:100%;" value="manager@fleetflow.com" required>
+        </div>
+
+        <div class="driver-form-group" style="margin-bottom: 20px;">
+          <label class="driver-form-label" style="color: var(--text-secondary);">Password</label>
+          <input type="password" id="login-password" class="driver-form-input" style="background: rgba(255,255,255,0.05); color: #fff; border-color: var(--border-color); width:100%;" value="password" required>
+        </div>
+
+        <button type="submit" class="driver-btn primary-action" style="width: 100%; border: none;">Sign In</button>
+      </form>
+      
+      <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 20px;">
+        <a href="#" style="color: var(--accent-secondary); text-decoration: none;" onclick="alert('Demo Access: click Sign In directly.')">Forgot Password?</a>
+        <span style="color: var(--text-muted);">v1.4.0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Controller/Role switcher header -->
+  <header class="role-header" id="app-header" style="display: none;">
+    <div class="logo-section">
+      <div class="logo-icon">FF</div>
+      <h1 class="logo-text">FleetFlow</h1>
+      <span style="background: rgba(6, 182, 212, 0.15); color: var(--accent-secondary); font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 12px; margin-left: 8px; border: 1px solid rgba(6, 182, 212, 0.3);">ENTERPRISE</span>
+    </div>
+
+    <div class="role-switcher-container">
+      <div class="sim-control-panel">
+        <button id="sim-speed-control" class="sim-speed-btn">Sim Speed: 1x</button>
+        <button id="sim-trigger-issue" class="sim-trigger-issue-btn">Trigger Mock Issue</button>
+      </div>
+
+      <div class="role-btn-group">
+        <button id="btn-role-manager" class="role-btn active" aria-label="Switch to Operations Manager View">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
+          Operations Manager
+        </button>
+        <button id="btn-role-driver" class="role-btn" aria-label="Switch to Mobile Driver Interface View">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>
+          Mobile Driver UI
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Global Application Wrapper -->
+  <div class="app-container">
+    
+    <!-- LEFT SIDEBAR: Manager View Navigation -->
+    <nav class="sidebar" id="sidebar-panel" style="display: none;">
+      <a href="#" class="sidebar-nav-item active" data-view="dashboard" id="nav-dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" /></svg>
+        Command Dashboard
+      </a>
+      <a href="#" class="sidebar-nav-item" data-view="trips" id="nav-trips">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.375c.9 0 1.625-.75 1.625-1.625V13.5M9 9h4.5M16.5 21.75a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM12.75 12h.008v.008h-.008V12zm.25 8.25h.008v.008H13v-.008zM19.5 8.25c0-1.38-1.12-2.5-2.5-2.5h-1.5V4c0-.55-.45-1-1-1H9.5c-.55 0-1 .45-1 1v1.75H7c-1.38 0-2.5 1.12-2.5 2.5v11.5c0 1.38 1.12 2.5 2.5 2.5h10c1.38 0 2.5-1.12 2.5-2.5V8.25z" /></svg>
+        Trip Management
+      </a>
+      <a href="#" class="sidebar-nav-item" data-view="tracking" id="nav-tracking">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+        Live GPS Tracking
+      </a>
+      <a href="#" class="sidebar-nav-item" data-view="financials" id="nav-financials">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h16.5m-16.5 3h16.5M3.75 12h16.5m-16.5 3h16.5M3.75 7.5v9M20.25 7.5v9" /></svg>
+        Financial Analytics
+      </a>
+      <a href="#" class="sidebar-nav-item" data-view="design-system" id="nav-ds">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122l.738 1.478a.75.75 0 001.352 0l.738-1.478 1.478-.738a.75.75 0 000-1.352l-1.478-.738-.738-1.478a.75.75 0 00-1.352 0l-.738 1.478-1.478.738a.75.75 0 000 1.352l1.478.738zM2.25 12a9.75 9.75 0 1119.5 0 9.75 9.75 0 01-19.5 0z" /></svg>
+        UI Design System
+      </a>
+      <a href="#" class="sidebar-nav-item" id="nav-logout" style="margin-top:auto; border-top:1px solid var(--border-color); padding-top:12px;">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+        Sign Out
+      </a>
+      <div class="sidebar-footer">
+        <p>V1.4.0 (Active)</p>
+        <p>GPS Engine Online</p>
+      </div>
+    </nav>
+
+    <!-- RIGHT/MAIN PAGE: Manager Content Frames -->
+    <main class="main-content" id="manager-view-frame" style="display: none;">
+      
+      <!-- VIEW 1: COMMAND CENTER DASHBOARD -->
+      <section class="view-container active" id="dashboard-view">
+        <div>
+          <h2>Operations Command Center</h2>
+          <p>Real-time metrics, live fleet routes, and operational events feed.</p>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="kpi-grid">
+          <div class="glass-card kpi-card">
+            <div class="kpi-header">
+              <span>Active Vehicles</span>
+              <div class="kpi-icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124l-.325-5.136a2.25 2.25 0 00-2.23-2.114H16.5V4.875A1.125 1.125 0 0015.375 3.75H5.625a1.125 1.125 0 00-1.125 1.125V14.25m12 4.5V14.25m-12 0h12" /></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-active-val">8</div>
+            <div class="kpi-trend up">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" style="width:12px;height:12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" /></svg>
+              <span>+12% vs yesterday</span>
+            </div>
+          </div>
+
+          <div class="glass-card kpi-card">
+            <div class="kpi-header">
+              <span>Vehicles Idle</span>
+              <div class="kpi-icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-idle-val">2</div>
+            <div class="kpi-trend neutral">
+              <span>Stable (Target &lt; 3)</span>
+            </div>
+          </div>
+
+          <div class="glass-card kpi-card">
+            <div class="kpi-header">
+              <span>Trips Running</span>
+              <div class="kpi-icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699-2.7c-.1.3-.21.61-.33.92m-.13 3.49c-.21.3-.43.6-.66.9" /></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-running-val">5</div>
+            <div class="kpi-trend up">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" style="width:12px;height:12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" /></svg>
+              <span>5 active paths</span>
+            </div>
+          </div>
+
+          <div class="glass-card kpi-card">
+            <div class="kpi-header">
+              <span>Trips Completed</span>
+              <div class="kpi-icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /></svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpi-completed-val">14</div>
+            <div class="kpi-trend up">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" style="width:12px;height:12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" /></svg>
+              <span>+3 completed today</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <!-- Second row KPIs -->
+          <div class="glass-card kpi-card kpi-revenue">
+            <div class="kpi-header">
+              <span>Revenue Today</span>
+              <div class="kpi-icon-wrapper">₹</div>
+            </div>
+            <div class="kpi-value" id="kpi-revenue-val">₹18,450</div>
+            <div class="kpi-trend up"><span>Gross revenue</span></div>
+          </div>
+
+          <div class="glass-card kpi-card kpi-expense">
+            <div class="kpi-header">
+              <span>Fuel Expense Today</span>
+              <div class="kpi-icon-wrapper">₹</div>
+            </div>
+            <div class="kpi-value" id="kpi-fuel-val">₹3,240</div>
+            <div class="kpi-trend down"><span>Based on fuel submissions</span></div>
+          </div>
+
+          <div class="glass-card kpi-card kpi-expense">
+            <div class="kpi-header">
+              <span>Toll Expense Today</span>
+              <div class="kpi-icon-wrapper">₹</div>
+            </div>
+            <div class="kpi-value" id="kpi-toll-val">₹950</div>
+            <div class="kpi-trend neutral"><span>RFID FASTag logs</span></div>
+          </div>
+
+          <div class="glass-card kpi-card kpi-profit">
+            <div class="kpi-header">
+              <span>Profit Today</span>
+              <div class="kpi-icon-wrapper">₹</div>
+            </div>
+            <div class="kpi-value" id="kpi-profit-val">₹14,260</div>
+            <div class="kpi-trend up"><span>Margin: ~77%</span></div>
+          </div>
+        </div>
+
+        <!-- Live map and activity layout -->
+        <div class="dashboard-layout">
+          <!-- SVG interactive map -->
+          <div class="glass-card map-card" id="dashboard-map-card">
+            <div class="map-header">
+              <h3>Live Fleet Radar System</h3>
+              <div class="filter-btn-group" style="padding:0;">
+                <span style="font-size:0.75rem; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
+                  <span style="width:8px; height:8px; border-radius:50%; background:var(--color-running); display:inline-block; animation: pulse-glow 1.5s infinite;"></span>
+                  GPS Feed Active
+                </span>
+              </div>
+            </div>
+
+            <!-- Map Controls overlay overlay -->
+            <div class="map-controls-overlay">
+              <button id="btn-zoom-in" class="map-control-btn" aria-label="Zoom In">+</button>
+              <button id="btn-zoom-out" class="map-control-btn" aria-label="Zoom Out">-</button>
+              <button id="btn-zoom-reset" class="map-control-btn" aria-label="Reset Map Zoom">⟲</button>
+            </div>
+
+            <div class="map-canvas-container">
+              <svg id="dashboard-map-svg" class="vector-map-svg" viewBox="0 0 800 500">
+                <!-- SVG map generated dynamically by app.js -->
+              </svg>
+              <!-- Hover popup tooltip -->
+              <div id="map-tooltip" class="map-tooltip"></div>
+            </div>
+          </div>
+
+          <!-- Live Activity Feed -->
+          <div class="glass-card feed-card">
+            <div class="feed-header">
+              <h3>Live Fleet Feed</h3>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px; color:var(--text-muted);"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+            </div>
+            <div class="feed-list" id="feed-list">
+              <!-- Logs populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: TRIP MANAGEMENT SCREEN -->
+      <section class="view-container" id="trips-view">
+        <div class="filter-bar">
+          <div>
+            <h2>Trip Management</h2>
+            <p>Track customer dispatches, vehicle metrics, and delivery fulfillment status.</p>
+          </div>
+          
+          <div class="search-input-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.602 10.602z" /></svg>
+            <input type="text" id="trip-search" class="search-input" placeholder="Search by customer, driver, or trip ID...">
+          </div>
+
+          <div class="filter-btn-group">
+            <button class="filter-btn active" data-filter="all">All Trips</button>
+            <button class="filter-btn" data-filter="assigned">Assigned</button>
+            <button class="filter-btn" data-filter="running">Running</button>
+            <button class="filter-btn" data-filter="delayed">Delayed</button>
+            <button class="filter-btn" data-filter="delivered">Delivered</button>
+            <button class="filter-btn" data-filter="issue">Issue</button>
+          </div>
+        </div>
+
+        <div class="trips-grid" id="trips-grid-container">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </section>
+
+      <!-- VIEW 3: LIVE GPS VEHICLE TRACKING -->
+      <section class="view-container" id="tracking-view">
+        <div>
+          <h2>Real-Time Fleet Telemetry Tracker</h2>
+          <p>Zoom in on individual vehicles to monitor GPS positions, speed, and status history.</p>
+        </div>
+
+        <div class="tracking-layout">
+          <!-- Sidebar: List of tracking vehicles -->
+          <div class="glass-card tracking-sidebar">
+            <div class="search-input-wrapper" style="max-width: 100%;">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.602 10.602z" /></svg>
+              <input type="text" id="tracking-search" class="search-input" placeholder="Search vehicle, driver...">
+            </div>
+            
+            <select id="tracking-filter-select" class="map-filter-select" style="width: 100%; padding: 10px;">
+              <option value="all">Show All Statuses</option>
+              <option value="running">Running</option>
+              <option value="delayed">Delayed</option>
+              <option value="delivered">Delivered</option>
+              <option value="issue">Issue</option>
+            </select>
+
+            <div class="tracking-list-container" id="tracking-list">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Main Interactive map tracking panel -->
+          <div class="glass-card map-card" style="height: 100%;">
+            <div class="map-header">
+              <h3>Live Telemetry Vector Map Overlay</h3>
+            </div>
+            <div class="map-canvas-container">
+              <svg id="tracking-map-svg" class="vector-map-svg" viewBox="0 0 800 500">
+                <!-- SVG map generated dynamically by app.js -->
+              </svg>
+
+              <!-- Selected vehicle stats floats -->
+              <div class="glass-card tracking-details-panel" id="tracking-stats-panel">
+                <!-- Stats updated dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: FINANCIAL ANALYTICS -->
+      <section class="view-container" id="financials-view">
+        <div>
+          <h2>Financial Dashboard & Fleet Analytics</h2>
+          <p>Analyze revenue, operational fuel logs, tolls, and overall profit efficiency margins.</p>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="glass-card kpi-card">
+            <div class="kpi-header"><span>Monthly Revenue</span></div>
+            <div class="kpi-value" id="fin-rev-val">₹285,400</div>
+          </div>
+          <div class="glass-card kpi-card">
+            <div class="kpi-header"><span>Monthly Expenses</span></div>
+            <div class="kpi-value" id="fin-exp-val">₹94,250</div>
+          </div>
+          <div class="glass-card kpi-card">
+            <div class="kpi-header"><span>Net Monthly Profit</span></div>
+            <div class="kpi-value" id="fin-profit-val">₹191,150</div>
+          </div>
+          <div class="glass-card kpi-card">
+            <div class="kpi-header"><span>Avg Fuel Efficiency</span></div>
+            <div class="kpi-value" id="fin-fuel-val">4.8 km/l</div>
+          </div>
+        </div>
+
+        <!-- Chart Grid -->
+        <div class="financial-grid">
+          <!-- Line chart of weekly revenue vs expense -->
+          <div class="glass-card chart-card">
+            <div class="chart-header">
+              <h3>Weekly Financial Trend</h3>
+              <span style="font-size:0.75rem; color:var(--text-muted);">
+                <span style="width:8px; height:8px; border-radius:50%; background:var(--accent-secondary); display:inline-block; margin-right:4px;"></span>Revenue
+                <span style="width:8px; height:8px; border-radius:50%; background:var(--color-issue); display:inline-block; margin-left:8px; margin-right:4px;"></span>Expense
+              </span>
+            </div>
+            <div class="chart-canvas-wrapper" id="line-chart-wrapper">
+              <!-- Inline custom SVG graph populated by app.js -->
+            </div>
+          </div>
+
+          <!-- Donut chart for expense allocations -->
+          <div class="glass-card chart-card">
+            <div class="chart-header">
+              <h3>Expense Breakdown</h3>
+            </div>
+            <div class="chart-canvas-wrapper" id="donut-chart-wrapper">
+              <!-- Donut chart populated by app.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Profit/Analytics Details cards -->
+        <div class="kpi-grid">
+          <div class="glass-card">
+            <h3>Most Profitable Vehicle</h3>
+            <p style="font-size:1.2rem; font-weight:600; color:#fff; margin-top:8px;" id="fin-best-v-val">V-101 (Container Truck)</p>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Total Trip Profit generated: ₹48,200</p>
+          </div>
+          <div class="glass-card">
+            <h3>Most Profitable Route</h3>
+            <p style="font-size:1.1rem; font-weight:600; color:#fff; margin-top:8px;" id="fin-best-r-val">North Industrial → South Warehouse</p>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Average route revenue per trip: ₹6,200</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: UI DESIGN SYSTEM EXPLORER -->
+      <section class="view-container" id="design-system-view">
+        <div>
+          <h2>FleetFlow UI/UX Design System Guide</h2>
+          <p>Standard design tokens, typography scales, buttons, badges, and interface assets used to build the platform.</p>
+        </div>
+
+        <div class="glass-card ds-container">
+          <!-- Color system -->
+          <div class="ds-section">
+            <h3>Color System & Accents</h3>
+            <div class="ds-color-grid">
+              <div class="ds-color-card" style="background:#0a0e17; border: 1px solid rgba(255,255,255,0.1);">
+                <span>Dark Background</span>
+                <span class="ds-color-hex">#0a0e17</span>
+              </div>
+              <div class="ds-color-card" style="background:#121824;">
+                <span>Card & Sidebar bg</span>
+                <span class="ds-color-hex">#121824</span>
+              </div>
+              <div class="ds-color-card" style="background:#4f46e5; color:#fff;">
+                <span>Indigo Brand</span>
+                <span class="ds-color-hex">#4f46e5</span>
+              </div>
+              <div class="ds-color-card" style="background:#06b6d4; color:#fff;">
+                <span>Cyan Accent</span>
+                <span class="ds-color-hex">#06b6d4</span>
+              </div>
+              <div class="ds-color-card" style="background:#3b82f6; color:#fff;">
+                <span>Assigned status</span>
+                <span class="ds-color-hex">#3b82f6</span>
+              </div>
+              <div class="ds-color-card" style="background:#10b981; color:#fff;">
+                <span>Running status</span>
+                <span class="ds-color-hex">#10b981</span>
+              </div>
+              <div class="ds-color-card" style="background:#f59e0b; color:#fff;">
+                <span>Delayed status</span>
+                <span class="ds-color-hex">#f59e0b</span>
+              </div>
+              <div class="ds-color-card" style="background:#ef4444; color:#fff;">
+                <span>Issue reported</span>
+                <span class="ds-color-hex">#ef4444</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Typography system -->
+          <div class="ds-section" style="border-top:1px solid var(--border-color); padding-top:20px;">
+            <h3>Typography Scales</h3>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <h1>Heading H1 (1.8rem / 700 Outfit font)</h1>
+              <h2>Heading H2 (1.4rem / 600 Outfit font)</h2>
+              <h3>Heading H3 (1.1rem / 600 Outfit font)</h3>
+              <p>Body Paragraph Text (0.9rem / 400 system scale)</p>
+              <span style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">Monospace scale for timestamps & vehicle logs</span>
+            </div>
+          </div>
+
+          <!-- Buttons system -->
+          <div class="ds-section" style="border-top:1px solid var(--border-color); padding-top:20px;">
+            <h3>Action Component Libraries</h3>
+            <div class="ds-btn-list">
+              <button class="role-btn active">Primary Button Active</button>
+              <button class="role-btn">Primary Button Hover</button>
+              <button class="sim-speed-btn">Secondary Button</button>
+              <button class="sim-trigger-issue-btn">Destructive Action Button</button>
+              <button class="track-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699-2.7c-.1.3-.21.61-.33.92m-.13 3.49c-.21.3-.43.6-.66.9" /></svg>
+                IconButton
+              </button>
+            </div>
+          </div>
+
+          <!-- Status badges list -->
+          <div class="ds-section" style="border-top:1px solid var(--border-color); padding-top:20px;">
+            <h3>Status Color Badges</h3>
+            <div class="ds-btn-list">
+              <span class="status-badge assigned">Assigned</span>
+              <span class="status-badge running">Running</span>
+              <span class="status-badge delayed">Delayed</span>
+              <span class="status-badge delivered">Delivered</span>
+              <span class="status-badge issue">Issue reported</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- DRIVER MOBILE INTERFACE MOCK SCREEN (ROLE SWITCHED VIEW) -->
+    <div class="driver-interface-view" id="driver-interface-view">
+      <!-- Device viewport shell frame -->
+      <div class="mobile-shell">
+        
+        <!-- Mobile status/header bar -->
+        <header class="phone-header">
+          <div class="driver-info-block">
+            <div class="driver-avatar">AS</div>
+            <div class="driver-name-plate">
+              <h3>Arjun Singh</h3>
+              <p>Truck Driver (ID: D-408)</p>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span id="driver-status-text" style="font-size:0.75rem; font-weight:600; color:var(--driver-text-body);">Active</span>
+            <div class="driver-status-dot"></div>
+            <button id="btn-driver-logout" style="background:none; border:none; color:var(--driver-text-body); cursor:pointer; margin-left:6px; display:flex; align-items:center;" aria-label="Sign Out">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Dynamic Mobile Body views -->
+        <div class="phone-content">
+          
+          <!-- SUBVIEW 1: Driver Main Actions & Active Trip Card -->
+          <div class="driver-sub-view" id="driver-dashboard-screen">
+            
+            <!-- Assigned vehicle details card -->
+            <div class="driver-card">
+              <div class="driver-card-title">Assigned Fleet Details</div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <strong style="color:var(--driver-text-title); font-size:1.1rem;">MH-12-QW-5640</strong>
+                  <div style="font-size:0.75rem; color:var(--driver-text-body); margin-top:2px;">Type: Tata Prima Container Truck (V-101)</div>
+                </div>
+                <span style="background: rgba(16, 185, 129, 0.1); color: var(--color-running); font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:10px;">Fit for road</span>
+              </div>
+            </div>
+
+            <!-- Header earnings boxes -->
+            <div class="driver-stats-row">
+              <div class="driver-stat-box">
+                <span class="driver-stat-label">Today's Trips</span>
+                <div class="driver-stat-val" id="driver-trips-val">1</div>
+              </div>
+              <div class="driver-stat-box">
+                <span class="driver-stat-label">Today's Earnings</span>
+                <div class="driver-stat-val" id="driver-earnings-val">₹2,400</div>
+              </div>
+            </div>
+
+            <!-- Active running trip details card -->
+            <div class="driver-card" id="driver-active-trip-card" style="display: flex;">
+              <div class="driver-card-title" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>Active Dispatch Route</span>
+                <span style="color:#10b981; font-weight:bold; font-size:0.7rem; animation: pulse-glow 1.5s infinite;">● LIVE TRIP</span>
+              </div>
+              
+              <div style="display:flex; justify-content:space-between; font-weight:700; font-size:0.95rem; color:var(--driver-text-title);">
+                <span id="driver-active-customer">Samsung India</span>
+                <span id="driver-active-trip-no" style="color:#4f46e5;">TR-3012</span>
+              </div>
+
+              <!-- Mini route line diagram -->
+              <div style="display:flex; align-items:center; gap:8px; margin: 8px 0;">
+                <span style="width:6px; height:6px; border-radius:50%; background:#06b6d4;"></span>
+                <span style="font-size:0.75rem; font-weight:600; color:var(--driver-text-title);" id="driver-route-start">Depot A</span>
+                <span style="flex:1; height:1.5px; border-top:1px dashed #cbd5e1;"></span>
+                <span style="width:6px; height:6px; border-radius:50%; background:#4f46e5;"></span>
+                <span style="font-size:0.75rem; font-weight:600; color:var(--driver-text-title);" id="driver-route-end">Harbor Terminal</span>
+              </div>
+
+              <div class="driver-stats-row">
+                <div class="driver-stat-box" style="background:#f8fafc; padding:8px;">
+                  <span class="driver-stat-label">Distance Traveled</span>
+                  <div class="driver-stat-val" id="driver-dist-val" style="font-size:1rem; margin-top:2px;">36 km</div>
+                </div>
+                <div class="driver-stat-box" style="background:#f8fafc; padding:8px;">
+                  <span class="driver-stat-label">Time Elapsed</span>
+                  <div class="driver-stat-val" id="driver-time-val" style="font-size:1rem; margin-top:2px;">1 hr 12m</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Unassigned / Next available trip alert card (visible when idle) -->
+            <div class="driver-card" id="driver-next-trip-card" style="display: none;">
+              <div class="driver-card-title">Next Assigned Dispatch</div>
+              <p style="font-size: 0.8rem; line-height:1.4;">There are currently no active routes running. Click the Start Trip button below to begin your next Samsung India consignment from Depot A.</p>
+            </div>
+
+            <!-- Large driver actions grid -->
+            <div class="driver-card">
+              <div class="driver-card-title">One-Hand Driver Actions</div>
+              <div class="driver-actions-grid">
+                <button class="driver-btn" id="btn-driver-fuel" aria-label="Log Fuel Purchases">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5M3 9.75h18M3 14.25h18" /></svg>
+                  Log Fuel
+                </button>
+                <button class="driver-btn" id="btn-driver-toll" aria-label="Log Toll Plaza Purchases">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h6m-1.5-11.25h3" /></svg>
+                  Log Toll Plaza
+                </button>
+                <button class="driver-btn" id="btn-driver-upload" aria-label="Upload Delivery Invoices or Documents">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" /></svg>
+                  Upload Invoice
+                </button>
+                <button class="driver-btn" aria-label="Report Traffic Delay or Issue" onclick="triggerNotification('Road construction reported. ETA recalculated on manager feed.', 'warning');">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                  Report Issue
+                </button>
+                
+                <button class="driver-btn primary-action running" id="driver-primary-action-btn" aria-label="Toggle active trip status">
+                  <!-- Button text generated dynamically in app.js -->
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBVIEW 2: Driver Logs Screen -->
+          <div class="driver-sub-view" id="driver-logs-screen" style="display: none;">
+            <div id="driver-logs-container">
+              <!-- Expense tables generated dynamically -->
+            </div>
+          </div>
+
+          <!-- SUBVIEW 3: Driver Assignments Screen -->
+          <div class="driver-sub-view" id="driver-trips-screen" style="display: none;">
+            <div style="font-weight:700; font-size:1.1rem; color:var(--driver-text-title); margin-bottom:4px;">Consignment History</div>
+            <p style="font-size:0.75rem; color:var(--driver-text-body); margin-bottom:12px;">Track past trip revenues and completed routes.</p>
+            <div id="driver-trips-list" style="display:flex; flex-direction:column; gap:12px; width:100%;">
+              <!-- History lists generated dynamically -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Phone screen bottom navigation bar -->
+        <nav class="phone-bottom-nav">
+          <button class="phone-nav-btn active" data-subview="dashboard" aria-label="Driver Home screen">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+            Home
+          </button>
+          <button class="phone-nav-btn" data-subview="logs" aria-label="Driver expense logging lists">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+            Expense Log
+          </button>
+          <button class="phone-nav-btn" data-subview="trips" aria-label="Driver trip history">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124l-.325-5.136a2.25 2.25 0 00-2.23-2.114H16.5V4.875A1.125 1.125 0 0015.375 3.75H5.625a1.125 1.125 0 00-1.125 1.125V14.25m12 4.5V14.25m-12 0h12" /></svg>
+            Trips List
+          </button>
+        </nav>
+
+        <!-- Sliding Driver Sheet/Modal Overlay -->
+        <div class="driver-modal-overlay" id="driver-modal-overlay">
+          <div class="driver-modal-content">
+            <div class="driver-modal-header">
+              <div class="driver-modal-title" id="driver-modal-title">Form Title</div>
+              <button class="driver-modal-close" id="driver-modal-close-btn" aria-label="Close modal">×</button>
+            </div>
+            <div id="driver-modal-body" style="display:flex; flex-direction:column; gap:16px;">
+              <!-- Dynamic modal content forms -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Global popups notifications area -->
+  <div class="notification-container" id="notification-area"></div>
+
+  <!-- Load script logic -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
