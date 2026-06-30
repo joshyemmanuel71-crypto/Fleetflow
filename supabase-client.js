@@ -68,3 +68,21 @@ async function saveTripToSupabase(trip) {
     progress: trip.progress
   }).eq('trip_no', trip.tripNo);
 }
+
+// Saves a fuel log entry to Supabase.
+async function saveFuelLogToSupabase(vehicleId, amount, qtyLiters) {
+  await supabaseClient.from('fuel_logs').insert({
+    vehicle_id: vehicleId,
+    amount: amount,
+    quantity_liters: qtyLiters
+  });
+}
+
+// Saves a toll log entry to Supabase.
+async function saveTollLogToSupabase(vehicleId, amount, location) {
+  await supabaseClient.from('toll_logs').insert({
+    vehicle_id: vehicleId,
+    amount: amount,
+    location: location
+  });
+}

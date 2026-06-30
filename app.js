@@ -1298,6 +1298,9 @@ function setupEventListeners() {
       addActivityItem('issue-reported', `Emergency dispatch: Driver <strong>${luckyVehicle.driver}</strong> (${luckyVehicle.id}) reported critical sensor error.`);
       triggerNotification(`Breakdown reported on ${luckyVehicle.id}! Operations team notified.`, 'error');
       
+      saveVehicleToSupabase(luckyVehicle);
+      if (trip) saveTripToSupabase(trip);
+      
       renderAllViews();
     } else {
       triggerNotification('No active running vehicles to trigger issues on.', 'warning');
@@ -1508,6 +1511,8 @@ window.submitFuelLog = function() {
   addActivityItem('fuel-added', `Fuel logged by driver <strong>Arjun Singh</strong> (V-101): ₹${amt.toLocaleString()} (${qty} Liters)`);
   triggerNotification(`Fuel entry ₹${amt.toLocaleString()} logged successfully.`, 'success');
 
+  saveFuelLogToSupabase(state.driverSession.vehicleId, amt, qty);
+
   closeDriverModal();
   renderDriverLogs();
   renderKPIs();
@@ -1539,6 +1544,8 @@ window.submitTollLog = function() {
   // Add Activity Feed
   addActivityItem('toll-added', `Toll Plaza expense logged for <strong>V-101</strong>: ₹${amt.toLocaleString()} at <strong>${loc}</strong>`);
   triggerNotification(`Toll expense ₹${amt.toLocaleString()} logged.`, 'success');
+
+  saveTollLogToSupabase(state.driverSession.vehicleId, amt, loc);
 
   closeDriverModal();
   renderDriverLogs();
@@ -1687,6 +1694,9 @@ window.submitStartTrip = function() {
   addActivityItem('trip-started', `Driver <strong>${state.driverSession.vehicleId}</strong> started trip <strong>${state.driverSession.tripNo}</strong> at Odo: <strong>${startKm.toLocaleString()} KM</strong>`);
   triggerNotification(`Trip started. Logged starting Odometer: ${startKm.toLocaleString()} KM`, 'success');
 
+  if (activeV) saveVehicleToSupabase(activeV);
+  if (activeT) saveTripToSupabase(activeT);
+
   closeDriverModal();
   renderDriverDashboard();
   renderAllViews();
@@ -1735,7 +1745,11 @@ window.submitEndTrip = function() {
 
     addActivityItem('delivered', `Delivery completed: Trip <strong>${activeT.tripNo}</strong> reached destination. Odo: <strong>${endKm.toLocaleString()} KM</strong> (Logged distance: <strong>${distanceDiff} KM</strong>)`);
     triggerNotification(`Trip completed. Odometer logged. Revenue: ₹${activeT.revenue.toLocaleString()}`, 'success');
+
+    saveTripToSupabase(activeT);
   }
+
+  if (activeV) saveVehicleToSupabase(activeV);
 
   closeDriverModal();
   renderDriverDashboard();
